@@ -1,5 +1,5 @@
 import json, torch
-from robust_sleep_net.modulo_net import ModuloNet  # مسیر ماژول را با نصب/کلون خودت تنظیم کن
+from robust_sleep_net.models.modulo_net import ModuloNet  # مسیر ماژول را با نصب/کلون خودت تنظیم کن
 
 DIR = "./pretrained_model/0dfcee73-055a-4c4d-929c-8fdf630e14f1/best_model"  # پوشه‌ای که 5 فایل داخلش است
 

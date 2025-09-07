@@ -85,3 +85,59 @@ def print_model_info(net):
     #     if i > 40: break
 
 print_model_info(net)
+
+
+import torch
+from torch import nn
+
+def _build_dummy_signals(net):
+    # ورودی ساختگی با شکل خام (B=1, T=input_temporal_context, C, L)
+    sig = {}
+    for g, desc in net.groups.items():
+        L, C = desc["shape"][0], desc["shape"][1]
+        x = torch.zeros((1, net.input_temporal_context, C, L), device=net.device)
+        sig[g] = x
+    return sig
+
+def print_summary(net):
+    dummy_signals = _build_dummy_signals(net)
+    rows, hooks = [], []
+
+    def register(name, module):
+        # فقط برای ماژول‌های برگ (بدون بچه)
+        if any(True for _ in module.children()):
+            return
+        def hook(mod, inp, out):
+            params = sum(p.numel() for p in mod.parameters())
+            trainable = sum(p.numel() for p in mod.parameters() if p.requires_grad)
+            if isinstance(out, torch.Tensor):
+                out_shape = list(out.shape)
+            elif isinstance(out, (list, tuple)) and len(out) and isinstance(out[0], torch.Tensor):
+                out_shape = [list(o.shape) for o in out]
+            else:
+                out_shape = str(type(out))
+            rows.append((name, mod.__class__.__name__, params, trainable, out_shape))
+        hooks.append(module.register_forward_hook(hook))
+
+    for name, module in net.named_modules():
+        register(name, module)
+
+    with torch.no_grad():
+        net({"signals": dummy_signals, "features": {}})  # forward برای گرفتن خروجی لایه‌ها
+
+    for h in hooks:
+        h.remove()
+
+    # چاپ جدول
+    print("\n{:<48} {:<28} {:>12} {:>12} {:>20}".format("Layer", "Type", "Params", "Trainable", "Output"))
+    print("-"*130)
+    for name, cls, p, t, shape in rows:
+        print("{:<48} {:<28} {:>12,} {:>12,} {:>20}".format(name, cls, p, t, str(shape)))
+    tot = sum(p for _,_,p,_,_ in rows)
+    trn = sum(t for _,_,_,t,_ in rows)
+    print("-"*130)
+    print(f"Total params: {tot:,} | Trainable: {trn:,}")
+
+# فراخوانی:
+print_summary(net)
+

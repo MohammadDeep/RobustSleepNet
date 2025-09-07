@@ -1,7 +1,7 @@
 import json, torch
 from robust_sleep_net.models.modulo_net import ModuloNet  # مسیر ماژول را با نصب/کلون خودت تنظیم کن
 
-DIR = "./pretrained_model/8f1969fa-0f79-426e-aaa5-7ab3a076a215/best_model"  # پوشه‌ای که 5 فایل داخلش است
+DIR = "./pretrained_model/fdbd193a-0408-4fc8-9a6a-a18351459512/best_model"  # پوشه‌ای که 5 فایل داخلش است
 
 with open(f"{DIR}/groups.json") as f: groups = json.load(f)
 with open(f"{DIR}/features.json") as f: features = json.load(f)

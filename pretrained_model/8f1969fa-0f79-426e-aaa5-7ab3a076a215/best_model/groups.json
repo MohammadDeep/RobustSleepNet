@@ -1,0 +1,1 @@
+{"eeg": {"fs": 60, "padding": 900, "shape": [1800, 5], "window_length": 1800, "encoder_input_shape": [1, 1, 5, 65, 28], "reducer_input_shape": [128, 28]}}
